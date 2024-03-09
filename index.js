@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
@@ -20,7 +20,7 @@ app.use(express.json());
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.jzgy2jc.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
-console.log(uri)
+// console.log(uri)
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -35,12 +35,25 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
-    const servicesCollection = client.db("homeDecorations").collection("allProduct")
+    const servicesCollection = client.db("homeDecorations").collection("allServices")
 
-    app.get("/allProduct", async (req, res) => {
+    // allServices 
+
+    app.get("/allServices", async (req, res) => {
         const result = await servicesCollection.find().toArray();
         res.send(result)
     })
+
+    // id
+
+    app.get("/allServices/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await servicesCollection.findOne(query);
+      res.send(result)
+  })
+
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
